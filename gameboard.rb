@@ -1,13 +1,8 @@
-  # scan for incomplete work by doing a Find: "# **"
-  # MAY 28, 2013 8AM PST, BUG LIST: 1 MINOR BUG IN VICTORY CONDITIONS --  UNABLE TO DETECT VERTICAL WINS.
-  # STILL NEED TO START AI COMPONENT
-  
-  # CREATED BY
-  # AMY HUA
-  # amyhua@uchicago.edu
-  
-  # UNIT TESTS ARE IN SEPARATE FILE, TESTS.RB
-  
+# AMY HUA
+# amyhua@gmail.com
+# Last updated: May 28, 2013 2:50PM EST
+
+
   class TicTacToe
     # A TicTacToeGame is roughly defined by:
     # 1. A nxn gameboard that users can see throughout turns
@@ -21,7 +16,7 @@
     # 4. Player Actions (e.g. making a turn, undoing a round)
   
     attr_accessor :board
-    attr_accessor :board90 #board rotated 90 degrees cw
+    attr_accessor :tboard #transpose board (rotated 90 degrees cw and flip horizontally)
     attr_accessor :size
     attr_accessor :p1 #player 1
     attr_accessor :p2 #player 2
@@ -60,16 +55,23 @@
         end
       end
       
-      @board90 = self.board.clone
+      @tboard = []
+      size.times do
+        self.tboard.push([])
+      end
+      for row in self.tboard
+        size.times do
+          row.push("_")
+        end
+      end
 
     end
-    
       
     def print_board(option={})
       if option =={}
         bd = self.board
       elsif option ==1
-        bd = self.board90
+        bd = self.tboard
       else
         raise ArgumentError
       end
@@ -87,24 +89,15 @@
       self.board.flatten.all? {|entry| (entry != "_")}
     end
     
-    def rotate_board()
-      # rotate the board by 90 degrees clockwise
-      for i in (1...size)
-        for j in (1...size)
-          self.board90[i][j]=self.board[j][-i]
-        end
-      end
-      return self.board90
-    end
     
     # ------------ ** VICTORY CONDITIONS ** -------------
 
-    def straight_win?(marker,m=size,option={}) # option: nil (original board) or 1 (rotated board)
+    def straight_win?(marker,m=size,option={}) # option: nil (original board) or 1 (transposed board)
       
       if option == {}
         bd = self.board
       elsif option == 1
-        bd = self.board90
+        bd = self.tboard
       else
         raise ArgumentError
       end      
@@ -134,7 +127,7 @@
       if option == {}
         bd = self.board
       elsif option == 1
-        bd = self.board90
+        bd = self.tboard
       else
         raise ArgumentError
       end
@@ -171,6 +164,16 @@
     # ------------ ** PLAYER ACTIONS ** -------------    
     
     def move(player) # player = 1 or 2
+      
+    # update transposed board
+
+    for i in (0...size)
+      for j in (0...size)
+        self.tboard[i][j] = self.board[j][i]
+      end
+    end
+    
+    # check if partial game
      if won?(1)
        puts "*** Player 1 WINS! ***"
      elsif won?(2)
@@ -178,6 +181,7 @@
      elsif game_over?
        puts "*** TIE! ***"
      else
+       # is a partial game
        # identify opponent and player
       if player == 1
         marker = "X" 
@@ -235,7 +239,6 @@
   end #class end
 
 # BEGIN GAME
-
 
 def new_game()
   g = TicTacToe.new
