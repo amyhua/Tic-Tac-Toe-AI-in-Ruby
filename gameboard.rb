@@ -1,4 +1,12 @@
   # scan for incomplete work by doing a Find: "# **"
+  # MAY 28, 2013 8AM PST, BUG LIST: 1 MINOR BUG IN VICTORY CONDITIONS --  UNABLE TO DETECT VERTICAL WINS.
+  # STILL NEED TO START AI COMPONENT
+  
+  # CREATED BY
+  # AMY HUA
+  # amyhua@uchicago.edu
+  
+  # UNIT TESTS ARE IN SEPARATE FILE, TESTS.RB
   
   class TicTacToe
     # A TicTacToeGame is roughly defined by:
