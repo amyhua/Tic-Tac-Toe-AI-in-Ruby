@@ -16,13 +16,8 @@
     # 4. Player Actions (e.g. making a turn, undoing a round)
   
     attr_accessor :board
-    attr_accessor :tboard #transpose board (rotated 90 degrees cw and flip horizontally)
+    attr_accessor :rboard #rotated board (rotated board by 90 degrees cw)
     attr_accessor :size
-    attr_accessor :p1 #player 1
-    attr_accessor :p2 #player 2
-    attr_accessor :win
-    attr_accessor :loss
-    attr_accessor :tie
     
   
     def initialize()
@@ -37,7 +32,7 @@
       puts "**********************************************"
       puts ""
 
-      puts "What NxN size gameboard do you want to play? E.g. 3, 4, 5, etc.: "
+      puts "What NxN size gameboard do you want to play? E.g. 3, 4, 5, etc. (Max=99): "
 
       size_s = gets.chomp
 
@@ -55,11 +50,11 @@
         end
       end
       
-      @tboard = []
+      @rboard = []
       size.times do
-        self.tboard.push([])
+        self.rboard.push([])
       end
-      for row in self.tboard
+      for row in self.rboard
         size.times do
           row.push("_")
         end
@@ -71,7 +66,7 @@
       if option =={}
         bd = self.board
       elsif option ==1
-        bd = self.tboard
+        bd = self.rboard
       else
         raise ArgumentError
       end
@@ -92,12 +87,12 @@
     
     # ------------ ** VICTORY CONDITIONS ** -------------
 
-    def straight_win?(marker,m=size,option={}) # option: nil (original board) or 1 (transposed board)
+    def straight_win?(marker,m=size,option={}) # option: nil (original board) or 1 (rotated board)
       
       if option == {}
         bd = self.board
       elsif option == 1
-        bd = self.tboard
+        bd = self.rboard
       else
         raise ArgumentError
       end      
@@ -113,21 +108,23 @@
     end
         
     def lower_diag_win?(marker)
+      # Upper Left to Lower Right Diagonal Win
       diagonal_twins?(size) && self.board[0][0]==marker
     end
     
     def upper_diag_win?(marker)
+      # Lower Left to Upper Right Diagonal Win
       # ** ROTATE BOARD, THEN do the same as lower_diag_win?
-      diagonal_twins?(size,1) && self.board[0][0]==marker
+      diagonal_twins?(size,1) && self.rboard[0][0]==marker
 
     end
     
     def diagonal_twins?(n,option={}) # n>=2; option: nil (original board) or 1 (rotated board)
-      #checks if elements along the (lower) diagonal of the board are all identical
+      #checks if pairs of adjacent elements along the (lower) diagonal of the board are both identical
       if option == {}
         bd = self.board
       elsif option == 1
-        bd = self.tboard
+        bd = self.rboard
       else
         raise ArgumentError
       end
@@ -135,7 +132,7 @@
       if n == 2 # base case
         bd[n-1][n-1]==bd[n-2][n-2]
       elsif bd[n-1][n-1]==bd[n-2][n-2]
-        diagonal_twins?(n-1)
+        diagonal_twins?(n-1,option)
       else
         return false
       end
@@ -165,11 +162,11 @@
     
     def move(player) # player = 1 or 2
       
-    # update transposed board
+    # update rotated board
 
     for i in (0...size)
       for j in (0...size)
-        self.tboard[i][j] = self.board[j][i]
+        self.rboard[i][j] = self.board[size-1-j][i]
       end
     end
     
@@ -224,8 +221,7 @@
         puts "***** Try again                                    *********"
         move(player)        
       elsif move == "EXIT"
-        puts "*** Player " + opponent.to_s + "WINS! ***"
-        exit
+        puts "*** Player " + opponent.to_s + " WINS! ***"
       else
         raise ArgumentError
       end
@@ -246,9 +242,9 @@ def new_game()
   g.move(1)
   print "Do you want to play a new game? (Y/N): "
   ans = gets.chomp
-  if ans == "Y"
+  if ans.upcase == "Y"
     new_game
-  elsif ans == "N"
+  elsif ans.upcase == "N"
     exit
   else
     raise ArgumentError
