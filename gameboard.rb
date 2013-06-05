@@ -1,7 +1,7 @@
 # AMY HUA
 # amyhua@gmail.com
 # Last updated: May 28, 2013 2:50PM EST
-# Last updated: June 4, 2013 7:17PM EST
+
 
   class TicTacToe
     # A TicTacToeGame is roughly defined by:
@@ -61,7 +61,8 @@
       end
 
     end
-      
+    # ------------------ ** PUBLISH GAMEBOARD ** -----------------
+    # Updated: added row and column headers for easy (row, column) detection
     def print_board(option={})
       if option =={}
         bd = self.board
@@ -71,10 +72,26 @@
         raise ArgumentError
       end
 
-      n = size-1
-      for i in (0..n)
-        for j in (0..n)
-          print "  " + bd[i][j] + "  "
+      n = size
+      print "   " #upper corner space
+      # print column headers
+      if n<10
+        for k in (1..n)
+          print "  #{k}  "
+        end
+      else
+        for k in (1..9)
+          print "  #{k}  "
+        end
+        for k in (10..n)
+          print "  #{k} "
+        end
+      end
+      print "\n\n" # begin board
+      for i in (1..n)
+        print "#{i}  " #row headers
+        for j in (1..n)
+          print "  " + bd[i-1][j-1] + "  "
         end
           print "\n\n"
       end
@@ -193,10 +210,10 @@
       move = gets.chomp # expected in "(i,j)" format
       # error-check for proper format
       if move =~ /[(](\d|\d\d)|[,](\d|\d\d)[)]/
-        i = move.match(/(\d|\d\d)/).to_s.to_i
-        j = move.match(/(\d|\d\d)/, move.index(',')).to_s.to_i
+        i = move.match(/(\d\d|\d)/).to_s.to_i
+        j = move.match(/(\d\d|\d)/, move.index(',')).to_s.to_i
         
-        if i > 0 && i <= size && j > 0 && j <= size
+        if 0 < i && i <= size && 0 < j && j <= size
           # correct format, no error scenario
           i = i-1
           j = j-1
@@ -207,8 +224,8 @@
             puts ""
             move(opponent)
           else
-            puts "***** ERROR: That position is already taken        ********"
-            puts "***** Try again                                    *********"
+            puts "***** ERROR: That position is already taken ********"
+            puts "***** Try again                             *********"
             move(player)
           end
         else
@@ -216,11 +233,11 @@
           puts "***** Try again                                  *********"
           move(player)
         end
-      elsif move != "EXIT"
+      elsif move.upcase != "EXIT"
         puts "***** ERROR: improper format. Use (i,j) format     *********"
         puts "***** Try again                                    *********"
         move(player)        
-      elsif move == "EXIT"
+      elsif move.upcase == "EXIT"
         puts "*** Player " + opponent.to_s + " WINS! ***"
       else
         raise ArgumentError
